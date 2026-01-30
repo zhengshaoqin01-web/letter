@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>给你的一封信</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at top, #fff1f5, #f3c6d3);
+      font-family: "PingFang SC", "Microsoft YaHei", serif;
+      overflow: hidden;
+    }
+
+    /* ================= 信封 ================= */
+    .envelope {
+      position: relative;
+      width: 340px;
+      height: 230px;
+      background: #f7e6ea;
+      border-radius: 10px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.25);
+      cursor: pointer;
+      transition: all .9s ease;
+      z-index: 5;
+    }
+
+    .envelope::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 2px solid #e8b7c6;
+      border-radius: 10px;
+      pointer-events: none;
+    }
+
+    .envelope:hover { transform: translateY(-6px); }
+
+    .envelope.open {
+      width: 460px;
+      height: 520px;
+      transform: translateY(-10px);
+    }
+
+    /* 上盖 */
+    .flap {
+      position: absolute;
+      inset: 0;
+      background: #f3d4dd;
+      clip-path: polygon(0 0, 100% 0, 50% 55%);
+      transform-origin: top;
+      transition: transform 1.2s ease;
+      z-index: 3;
+    }
+
+    .envelope.open .flap { transform: rotateX(180deg); }
+
+    /* 信纸 */
+    .letter {
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      width: 320px;
+      max-height: 420px;
+      background: #fff;
+      transform: translateX(-50%) translateY(100%);
+      transition: transform 1.2s ease .6s;
+      padding: 22px 24px;
+      border-radius: 6px;
+      z-index: 2;
+      overflow-y: auto;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.04);
+    }
+
+    .envelope.open .letter {
+      transform: translateX(-50%) translateY(-12px);
+    }
+
+    /* 正文 */
+    .content {
+      opacity: 0;
+      transition: opacity 1s ease 1.6s;
+      line-height: 1.9;
+      font-size: 16px;
+      color: #333;
+      white-space: pre-wrap;
+      animation: breathe 3s ease-in-out infinite;
+      word-break: break-word;
+    }
+
+    .envelope.open .content { opacity: 1; }
+
+    @keyframes breathe {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.015); }
+      100% { transform: scale(1); }
+    }
+
+    /* 打字光标 */
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background: #555;
+      margin-left: 2px;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%,50% { opacity: 1; }
+      50.01%,100% { opacity: 0; }
+    }
+
+    .hint {
+      position: absolute;
+      bottom: 22px;
+      font-size: 14px;
+      color: #6b4b55;
+      opacity: .85;
+      animation: hintPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes hintPulse {
+      0% { opacity: .5; }
+      50% { opacity: .9; }
+      100% { opacity: .5; }
+    }
+
+    /* ================= 卡通苹果 ================= */
+    .apple {
+      position: absolute;
+      width: 44px;
+      height: 42px;
+      background: #ff7a7a;
+      border-radius: 48% 48% 52% 52%;
+      box-shadow: inset -4px -6px 0 rgba(0,0,0,.08);
+      animation: floatUp linear infinite, sway 4s ease-in-out infinite;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .apple::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border: 2px solid #333;
+      border-radius: 50%;
+    }
+
+    .apple::after {
+      content: "";
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      width: 22px;
+      height: 12px;
+      background: #4caf50;
+      border-radius: 0 100% 0 100%;
+      transform: translateX(-50%) rotate(-15deg);
+    }
+
+    .eye {
+      position: absolute;
+      top: 22px;
+      width: 4px;
+      height: 4px;
+      background: #333;
+      border-radius: 50%;
+    }
+    .eye.left { left: 16px; }
+    .eye.right { right: 16px; }
+
+    .mouth {
+      position: absolute;
+      top: 26px;
+      left: 50%;
+      width: 8px;
+      height: 4px;
+      border-bottom: 2px solid #333;
+      border-radius: 0 0 10px 10px;
+      transform: translateX(-50%);
+    }
+
+    /* 爱心 */
+    .heart {
+      width: 26px;
+      height: 26px;
+      background: #ff7a7a;
+      transform: rotate(45deg);
+      border-radius: 4px;
+    }
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      background: #ff7a7a;
+      border-radius: 50%;
+    }
+    .heart::before { left: -13px; }
+    .heart::after { top: -13px; }
+
+    @keyframes floatUp {
+      from { transform: translateY(110vh) scale(0.7); }
+      to { transform: translateY(-140px) scale(1.05); }
+    }
+
+    @keyframes sway {
+      0% { margin-left: 0; }
+      50% { margin-left: 12px; }
+      100% { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="envelope" id="envelope">
+  <div class="flap"></div>
+  <div class="letter">
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<div class="hint">点击信封 ✉️</div>
+
+<!-- ⚠️ 音乐文件名请改成英文，例如 special_person.mp3 -->
+<audio id="bgm" loop preload="auto">
+  <source src="special_person.mp3" type="audio/mpeg" />
+</audio>
+
+<script>
+  const envelope = document.getElementById('envelope');
+  const contentEl = document.getElementById('content');
+  const bgm = document.getElementById('bgm');
+
+  const letterText = `亲爱的蔡小姐，
+	记得上次应该说提笔呢，还是说记录呢，总之打开电脑敲下关于你的文字已经是一个月多前的事情了。是呀，提起你，总是千言无语说不尽似的，你呢，在我心里就是这样的存在。人们常常说，文字是有力量的亦是有温度的。虽然我不敢夸大的讲，自己时常湿润双眼思考着这些文字，因为确实没有夸张到每每敲击键盘都至于泪流的程度，我也不想过渡渲染来得到些许感动。我时而思考，我的文字是否也曾撩拨过你的心弦，也是否让你动容。或许有些时候，不论文字或其他，我总犹如管中窥豹般，似乎看不透半点你的内心。
+	起初，我总想是否自己太执着自己总希望做些什么能得到反馈有问题。当然，我也并不是秉承着需要反馈的发愿去做任何事的。后来，我觉得或许这样的心理并没有问题，没有人希望自己去做一件事情是徒劳，更甚对结果好坏一无所知呢。其实这些想法，大致的也向你表达过啦，之前呢有些时候长篇大论完，甚至怕觉得自己啰嗦，结果更没想到的是似乎就被忽略带过。后来呢或许是我表达起了作用，至少不是完全忽略了。其实每每表达出这些，我是有一些抵触的，因为心里总有一种似乎推着你要你反馈我一下的滋味，一方面感觉会让你不情愿，另一方面又怕进而这样的行为多了，让你对我也有抵触的心理，感觉很多事情确实无感又因为我的期待要给出一些反馈来满足我一样，那样会很累的，我知道。我也在思考仿佛无穷无尽时而感到疏远冷漠，怕你没那么喜欢我，究竟是否完全都是不为我所知的巨大的压力所导致所塑造。胡思乱想，或者惶恐不安，大多是因为是不稳定的畏惧吧，我从未判断你对我的喜欢为零，但也丝毫不敢不惧怕变为零，也许是因为之前被删除拉黑，也许是因为我至始至终琢磨不透，似乎从某个时刻开始，时而消失成为常态。因为百分之百的确定，我感觉时而冷漠完全是源于那些我不知道的你的压力，还是有各种因素影响下，确实发自内心地对我冷漠呢。如果是前者，完全是因为我未知种种事情压在你身上，迫使你喘不过气来，我也在想这样的日子什么时候是个头，我能帮上什么，我能改变什么。我仍旧记得之前提到想确认的一些问题，现在回看，其实五个问，只有两个比较跟未来有关联，其余三个更多是当下的想法，但是你以不喜欢谈论过多未来为由一个也没答复。你说因为相信他人未来许诺被伤太深，矛盾的是，我并不喜欢揭伤疤，当我又极度想要多了解你（不想你痛苦又想了解你过往的痛苦，总归怎么翻来覆去也想不出一个好的对策）。我不知道遇到什么样的人什么样的事情，我觉得一直天马行空畅想美好未来，或许像空头支票或许会对落空造成更大的失落与悲伤。我呢，是一个特别在意说出口的话的人，我感觉说出口许诺，后来忘却也是特别伤人的。有些或许还谈不上特别遥远的未来，或许短期的未来的许诺，我也努力兑现了。如果比较理性评价自己这些，或许我又可能扫兴的说，不必太在意，努力都一一靠近能做到，那才是满满成就感。
+	想起来一件小小的事情，记得年初到了车厘子上市的时节，我一想你吃点这个肯定很不错，然后满心欢喜挑了又挑后，总算是安排上了。有一天跟你谈及挑起车厘子商家的过程时，你提及以后别买那家。然后我就在意了好久，全然都是因为“以后”二字，我很开心觉得这也算是你接受未来还有我给你安排。说不出来怎么去形容，我总不断地期待着有你的未来，当然我也必须承担对没你的未来的恐惧。我想，我需要你，我太想与你相互依偎渡过无数日夜。令人懊恼的是，昨天文思泉涌，到了今天又仿佛一时语塞。其实是有些话好像当下也差些勇气敲下，但一直以来许多文字，也在抽丝剥茧般一点点展露自己想法吧。我一时不知道怎么好好组织语言了，或许简而言之，我总是想知道你对我完完全全的想法，不论是爱或者喜欢的程度，更多的哪里让你不适让你不满，哪里让你满意，好好坏坏的所有所有事情下来，我在你心里所有的看法，我是怎样的。其实好奇太多，我就会怕难住你，但总归不能是永远没答案吧，我也愿意等待。
+	又降温了呢，不知道你的被窝暖不暖呢，近来睡得好不好。说不上来怎得，此时心又揪了一下，无论是你自己或是我也有在想努力希望你过得更好一些，总不时一些我知道或不知道的事情会打破宁静。当然这样令人讨厌的事情再怎样发生，无法阻挡我期望着你平安顺遂。记得有段时间，似乎毫无契机地回想起一件事。之前我偶然提及之前有人以面相推测着自己在三十事业爱情能稳定些，然后我期待与担忧着那时与我在一起的人是不是你，你还对我有多少喜欢。结果你说不是你也是更好的人，我当时很气愤你的想法，也立马告诉你希望你别这样想。结果谁曾想，过去许久后，我竟想起，你在未来遇到一个样样比我好的人喜欢着你，我好像也只会语塞了，不知道有什么理由不选择别人而是我。后来我也只好努力让自己在当下不去幻想这种不吉利的未来。其实有时候，我可能都有一些烦自己，总在不断纠结，你到底多喜欢我呢，自己哪里没做好会不会让你变得不那么喜欢我呢。哎呀，可是我真的好想一直跟你相爱下去。我以前有过一个思考，应该从未跟你讲过。我感觉，与各种各样的方式见闻到的情感破裂，大多数都以两种方式走向终结，要么一开始平平淡淡，在时间推移中，两个人之间到达了一个极为亲密的顶点后，最后走向越来越淡。要么一开始轰轰烈烈就爱的死去活来，最后极速下滑。总而言之，至少一开始都不太差吧，故而纳兰性德写到“人生若只如初见”。也有许多人在情感破裂后或濒临破裂时，感叹为何“带人如初”四字之难。或许从理性上看，确实两个人在一起愉悦的多巴胺是何难一直维持的。不过人活于世，感性与理性总是如爬墙虎般遍布整个人生的，我呢，跟不用说了，我大多时候还是感性大于理性的。我总思考，其实期待“带人如初”，都是因为走在了我说的两种情感破裂的形式的下滑阶段。或许，并非一定要“待人如初”呢，感情初始的火热不必升温太快，如果是一直慢慢升温，互相地对对方越来越好呢，不失为一个更好的选择吧。想起来看到一个，或许感觉你没那么喜欢，只是因为期待你更爱一些些。其实我还是不太敢期望太多，我只觉得在我充满未知的情况下，你身上总压着千斤担。细细一想，其实好想累计的以后告诉我的事越来越多了，我也不知道会不会以致于以后你也忘了呢。我总想真的真的都解决的时候，我可以正式地向你告白吗，你会接受吗，那时你有多喜欢我呢。在那到来之前，或许最大的期愿有二，一是你不要离开我了，二是祝你平安。
+	一转眼，新的一年的第一月也即将结束，农历的新年也即将到来，在此也提前希望在这一年里你可以过得快乐一些，烦恼少一些。其实文字到这似乎可以结束了，但是出于小私心，我还是加上，我还想你多爱我一些，我们俩可以更好一些。
+爱你的宝
+`;
+
+  let opened = false;
+
+  function spawnApple(extra = false) {
+    const el = document.createElement('div');
+    const isHeart = Math.random() < 0.18;
+    el.className = isHeart ? 'apple heart' : 'apple';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.animationDuration = (extra ? 6 : 12) + Math.random() * 8 + 's';
+    if (!isHeart) {
+      el.innerHTML = '<div class="eye left"></div><div class="eye right"></div><div class="mouth"></div>';
+    }
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 20000);
+  }
+
+  for (let i = 0; i < 10; i++) spawnApple();
+
+  envelope.addEventListener('click', () => {
+    if (opened) return;
+    opened = true;
+    envelope.classList.add('open');
+
+    for (let i = 0; i < 14; i++) spawnApple(true);
+
+    // 🎵 音乐淡入播放（手机 / 电脑通用）
+    bgm.volume = 0;
+    bgm.play().catch(() => {});
+    let v = 0;
+    const fade = setInterval(() => {
+      v += 0.02;
+      bgm.volume = Math.min(v, 0.45);
+      if (v >= 0.45) clearInterval(fade);
+    }, 120);
+
+    const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
+    typeWriter(letterText, contentEl, isMobile ? 90 : 60);
+  });
+
+  function typeWriter(text, element, speed) {
+    let i = 0;
+    element.textContent = '';
+    const cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    element.appendChild(cursor);
+
+    const timer = setInterval(() => {
+      if (i < text.length) {
+        element.textContent = element.textContent.replace(/\|$/, '') + text.charAt(i);
+        i++;
+        element.appendChild(cursor);
+      } else {
+        clearInterval(timer);
+        cursor.remove();
+      }
+    }, speed);
+  }
+</script>
+
+</body>
+</html>
